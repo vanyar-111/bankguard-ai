@@ -1,0 +1,32 @@
+# Flutter
+build/
+.dart_tool/
+.packages
+.flutter-plugins
+.idea/
+*.iml
+
+# Node.js
+node_modules/
+.env
+dist/
+npm-debug.log
+
+# React
+build/
+.next/
+.env.local
+.env.production
+.env.development
+
+# Python / TFLite
+__pycache__/
+*.pyc
+*.ipynb_checkpoints
+*.tflite
+*.h5
+.DS_Store
+
+# OS-specific
+Thumbs.db
+.DS_Store
