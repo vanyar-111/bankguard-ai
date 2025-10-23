@@ -1,4 +1,4 @@
-# bankguard_ai
+# Bankguard_ai
 BankGuard AI
 
 BankGuard AI is a behavior-based continuous authentication system for mobile banking.
