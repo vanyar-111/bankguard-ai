@@ -1,43 +1,82 @@
-<<<<<<< HEAD
-# Bankguard_ai
-BankGuard AI
+# SessionLock
 
-BankGuard AI is a behavior-based continuous authentication system for mobile banking.
-It enhances app security by analyzing user interaction patterns (typing speed, touch pressure, navigation behavior, device orientation) in real time — using on-device ML (TensorFlow Lite) to detect anomalies and trigger adaptive security actions like FaceID or OTP.
+**SessionLock**- Behavior-based Cntinuous Authentication (Architecture Prototype)
 
-Current Status
+SessionLock is an **architecture focused prototype** for behavior-based continuous authentication in mbile applications. Instead of relying on static credentials (Passwords, OTPs, biometrics) it models user interaction behavior and evaluates risk continuously during a session.
 
-~Supabase Auth (Register/Login/Session)
-~Routing (Login → Dashboard → Settings)
-~Next: Behavioral Data Collection & Risk Scoring (Week 2)
-~Future: On-device ML model integration (Week 3)
+This repository intentionally focuses on event collection, risk scoring and adaptive decision logic, not on building a production-ready mobile app.
 
-Tech Stack
+## Problem Statement
+Traditional authentication mechanisms have clear weaknesses: 
+-Passwords and OTPs can be shared, phished or replayed.
+-Biometrics are static and only verified at login.
+-Authentication is usually binary (pass/fail), not continuous.
 
-~Flutter (Frontend)
-~Supabase (Auth + Backend)
-~TensorFlow Lite (on-device ML)
-~Node.js + Supabase (for optional admin dashboard)
+SessionLock explores the idea of continuous authentication.
 
-Setup
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/vanyar-111/bankguard-ai.git
-=======
-# bankguard_flutter
+## Core Idea
+Every user interacts with an app in a unique way. SessionLock continuously observes interaction patterns and compares them against expected behavior to assign a real-time risk score.
 
-A new Flutter project.
+### Examples of behavioral signals:
+- Tap Duration
+- Typing rhythm (time between key presses)
+- Interaction frequency 
+- Screen-level activity context
+These signals are hard to replicate, even if credentials are compromised.
 
-## Getting Started
+## Architecture Overview
 
-This project is a starting point for a Flutter application.
+User Interaction
+      ↓
+Behavior Collector (captures raw events)
+      ↓
+Risk Engine (evaluates deviation + thresholds)
+      ↓
+Risk Result:
+     Low- Silent Continuation
+     Medium- Verification Prompt
+     High- Session Termination
 
-A few resources to get you started if this is your first Flutter project:
+This flow is event driven and intentionally decoupled:
+-No UI logic inside risk evaluation 
+-No platform-specific dependencies
+-Deterministics, explainable decisions
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Repository Structure
+lib/
+├── behavior/
+│ └── behavior_collector.dart // Collects interaction events
+├── risk/
+│ ├── risk_engine.dart // Core risk evaluation logic
+│ └── risk_result.dart // Risk levels & explanations
+└── main.dart // Minimal demo wiring behavior → risk
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> f55a266 (Add core behavior-based authentication and risk scoring architecture)
+## Scope Disclaimer
+
+This project is not:
+- A full banking application
+- A production-ready authentication system
+- A UI-focused Flutter app
+
+This project is:
+- An architectural prototype
+- A demonstration of behavioral security thinking
+- A foundation for future ML-based or adaptive authentication systems
+
+## What This Demonstrates Technically
+
+- Event-driven system design
+- Behavioral modeling without raw biometrics
+- Risk scoring using explicit thresholds
+- Separation of concerns (collection vs evaluation vs response)
+- Security-oriented product thinking
+
+## Future Extensions (Out of Scope for This Repo)
+
+- ML-based anomaly detection
+- On-device model training
+- Backend-assisted session analytics
+- Privacy-preserving behavioral baselines
+
+These are deliberately excluded to keep the prototype focused and auditable.
+
