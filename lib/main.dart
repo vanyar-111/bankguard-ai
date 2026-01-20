@@ -4,18 +4,26 @@ import 'behavior/behavior_collector.dart';
 import 'risk/risk_engine.dart';
 
 final BehaviorCollector behaviorCollector = BehaviorCollector();
+final RiskEngine riskEngine = RiskEngine();
+
+// Demo-only baseline (hardcoded for prototype clarity)
+final UserBaseline demoBaseline = UserBaseline(
+  avgTypingSpeed: 4.0, // keys per second
+  avgTapDuration: 120,
+  commonFirstScreen: 'home',
+);
 
 void main() {
-  runApp(const BankGuardApp());
+  runApp(const SessionLockApp());
 }
 
-class BankGuardApp extends StatelessWidget {
-  const BankGuardApp({super.key});
+class SessionLockApp extends StatelessWidget {
+  const SessionLockApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BankGuard AI',
+      title: 'SessionLock',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: const BehaviorDemoScreen(),
@@ -33,17 +41,31 @@ class BehaviorDemoScreen extends StatefulWidget {
 class _BehaviorDemoScreenState extends State<BehaviorDemoScreen> {
   DateTime? _tapStart;
 
-  void _checkRisk(BuildContext context) {
-    final result = behaviorCollector.evaluateIfNeeded(currentScreen: 'demo');
+  void _evaluateIfWindowReady(BuildContext context) {
+    final window = behaviorCollector.collectWindowIfReady();
+    if (window == null) return;
+
+    final features = BehaviorFeatures(
+      avgTypingSpeed: window.typingSpeedKps,
+      typingVariance: window.typingVariance,
+      avgTapDuration: window.avgTapDurationMs,
+      eventsPerWindow: window.eventCount,
+      firstScreenAfterLogin: 'home', // fixed for demo
+    );
+
+    final result = riskEngine.evaluate(
+      current: features,
+      baseline: demoBaseline,
+    );
 
     if (result.level == RiskLevel.medium) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Verification Required'),
+          title: const Text('Additional Verification Required'),
           content: Text(
             result.reasons.isEmpty
-                ? 'Additional verification required.'
+                ? 'Suspicious behavior detected.'
                 : result.reasons.join('\n'),
           ),
           actions: [
@@ -73,27 +95,32 @@ class _BehaviorDemoScreenState extends State<BehaviorDemoScreen> {
       },
       onTapUp: (_) {
         if (_tapStart != null) {
-          final durationMs = DateTime.now()
-              .difference(_tapStart!)
-              .inMilliseconds;
+          final durationMs =
+              DateTime.now().difference(_tapStart!).inMilliseconds;
 
           behaviorCollector.recordTap(tapDurationMs: durationMs);
-          _checkRisk(context);
+          _evaluateIfWindowReady(context);
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('BankGuard AI – Behavior Demo')),
+        appBar: AppBar(
+          title: const Text('SessionLock — Behavior Demo'),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Type below to generate behavior signals'),
+              const Text(
+                'Type below to generate behavioral signals',
+              ),
               const SizedBox(height: 16),
               TextField(
                 onChanged: (_) {
-                  behaviorCollector.recordKeyPress(timeBetweenKeysMs: 200);
-                  _checkRisk(context);
+                  behaviorCollector.recordKeyPress(
+                    timeBetweenKeysMs: 200, // demo value
+                  );
+                  _evaluateIfWindowReady(context);
                 },
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
